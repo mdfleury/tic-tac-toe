@@ -9,6 +9,7 @@ function Cell(x, y) {
 function TicTacToeViewModel() {
 	var self = this;
 
+	// Editable data
 	self.cells = ko.observableArray([
 		new Cell(0, 0),
 		new Cell(0, 1),
@@ -37,6 +38,7 @@ function TicTacToeViewModel() {
 			self.winner('X');
 			return true;
 		} else {
+			// see if x won
 			oCount = _.filter(cells, function (cell) {
 				return cell.owner() === 'O' ? true : false; 
 			});
@@ -72,34 +74,20 @@ function TicTacToeViewModel() {
 		};
 		
 		// check diags
-		diag = _.filter(cells, function (cell) {
-			switch (true) {
-				case cell.x === 0 && cell.y === 0:
-					return true;
-				case cell.x === 1 && cell.y === 1:
-					return true;
-				case cell.x === 2 && cell.y === 2:
-					return true;
-				default:
-					return false;
-			}
-		});
+		diag = _.intersectionWith(cells, [
+			{'x': 0, 'y': 0},
+			{'x': 1, 'y': 1},
+			{'x': 2, 'y': 2}
+		], self.isEqual);
 		if (self.checkCells(diag)) {
 			return;
 		}
 
-		diag = _.filter(cells, function (cell) {
-			switch (true) {
-				case cell.x === 0 && cell.y === 2:
-					return true;
-				case cell.x === 1 && cell.y === 1:
-					return true;
-				case cell.x === 2 && cell.y === 0:
-					return true;
-				default:
-					return false;
-			}
-		});
+		diag = _.intersectionWith(cells, [
+			{'x': 0, 'y': 2},
+			{'x': 1, 'y': 1},
+			{'x': 2, 'y': 0}
+		], self.isEqual);
 		if (self.checkCells(diag)) {
 			return;
 		}
@@ -135,6 +123,10 @@ function TicTacToeViewModel() {
 		self.clicks = 0;
 		self.isDraw(false);
 		self.winner('');
+	};
+
+	self.isEqual = function (cell1, cell2) {
+		return cell1.x === cell2.x && cell1.y === cell2.y;
 	};
 }
 
